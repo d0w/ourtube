@@ -1,6 +1,9 @@
 import { createError } from "../error.js"
 import User from "../models/User.js";
 
+// READ: req.user.id - user ids sent from JWT verification
+//       req.params.id - id sent from request
+
 export const update = async(req, res, next) => {
     // checking token user and current user
     if (req.params.id === req.user.id) {
@@ -17,12 +20,49 @@ export const update = async(req, res, next) => {
     }
 }
 export const deleteUser = async(req, res, next) => {
+    if (req.params.id === req.user.id) {
+        try {
+            const deleteUser = await User.findByIdAndDelete(req.params.id);
+            res.status(200).json("User has been deleted");
+        } catch(error) {
+            next(createError(403, "Can only update your own account"));
+        }
+    }
 }
-export const getUser= async(req, res, next) => {
+export const getUser = async(req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id);
+        res.status(200).json(user);    
+    } catch(error) {
+        next(error);
+    }
+    
 }
 export const subscribe = async(req, res, next) => {
+    try {
+        await User.findByIdAndUpdate(req.user.id, {
+            $push: { subscribedUsers: req.params.id }
+        });
+        await User.findByIdAndUpdate(req.params.id, {
+            $inc: { subscribers: 1 }
+        });
+        res.status(200).json("Subscription Successful");
+    } catch (error) {
+        next(error);
+    }
 }
 export const unsubscribe = async(req, res, next) => {
+    try {
+        await User.findByIdAndUpdate(req.user.id, {
+            $pull: { subscribedUsers: req.params.id }
+        });
+        await User.findByIdAndUpdate(req.params.id, {
+            $inc: { subscribers: -1 }
+        });
+        res.status(200).json("Unsubscription Successful");
+    } catch (error) {
+        next(error);
+    }
 }
 export const like = async(req, res, next) => {
 }
