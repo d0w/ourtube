@@ -1,5 +1,6 @@
 import express from "express";
-import { deleteUser, dislike, getUser, like, subscribe, update } from "../controllers/user.js"
+import { verify } from "jsonwebtoken";
+import { deleteUser, dislike, getUser, like, subscribe, unsubscribe, update } from "../controllers/user.js"
 import { verifyToken } from "../verifyToken.js"
 
 const router = express.Router();
@@ -11,18 +12,18 @@ router.put("/:id", verifyToken, update)
 router.get("/user/:id", getUser)
 
 // sub to user
-router.put("/sub/:id", subscribe);
+router.put("/sub/:id", verifyToken, subscribe);
 
 // unsub user
-router.get("/unsub/:id")
+router.put("/unsub/:id", verifyToken, unsubscribe)
 
 // delete user
-router.delete("/:id", deleteUser);
+router.delete("/:id", verifyToken, deleteUser);
 
 // like video
-router.put("/like/:videoId", like);
+router.put("/like/:videoId", verifyToken, like);
 
 // dislike video
-router.put("/dislike/:videoId", dislike);
+router.put("/dislike/:videoId", verifyToken, dislike);
 
 export default router;
