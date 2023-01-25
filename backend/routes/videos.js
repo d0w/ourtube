@@ -32,5 +32,5 @@ router.get("/sub", verifyToken, sub)
 router.get("/tags", getByTags)
 
 // search
-router.get("/search/:id", search)
+router.get("/search", search)
 export default router;
