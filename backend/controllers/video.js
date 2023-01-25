@@ -87,6 +87,7 @@ export const getByTags = async (req, res, next) => {
     console.log(tags);
     try {
            const videos = await Video.find({ tags: { $in: tags }}).limit(20);
+           res.status(200).json(videos);
     } catch (error) {
         next(error);
     }
@@ -98,7 +99,7 @@ export const search = async (req, res, next) => {
         res.status(200).json(videos);    
     } catch (error) {
         next(error);
-    }ç
+    }
 }
 
 export const sub = async (req, res, next) => {

@@ -17,4 +17,4 @@ const CommentSchema = new mongoose.Schema({
     
 }, {timestamps: true})
 
-export default mongoose.model("Video", VideoSchema);
+export default mongoose.model("Comments", CommentSchema);

@@ -1,5 +1,6 @@
 import { createError } from "../error.js"
 import User from "../models/User.js";
+import Video from "../models/Video.js";
 
 // READ: req.user.id - user ids sent from JWT verification
 //       req.params.id - id sent from request
@@ -65,6 +66,28 @@ export const unsubscribe = async(req, res, next) => {
     }
 }
 export const like = async(req, res, next) => {
+    const id = req.user.id;
+    const videoId = req.params.videoId;
+    try {
+        await Video.findByIdAndUpdate(videoId, {
+            $addToSet: { likes: id },
+            $pull: { dislikes: id }
+        })
+        res.status(200).json("Video has been liked");
+    } catch(error) {
+        next(error);
+    }
 }
 export const dislike = async(req, res, next) => {
+    const id = req.user.id;
+    const videoId = req.params.videoId;
+    try {
+        await Video.findByIdAndUpdate(videoId, {
+            $addToSet: { dislikes: id }, // addtoset allows unique ids to be added only
+            $pull: { likes: id }
+        })
+        res.status(200).json("Video has been disliked");
+    } catch(error) {
+        next(error);
+    }
 }
