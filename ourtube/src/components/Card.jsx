@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { format } from "timeago.js";
 import axios from "axios";
+axios.defaults.baseURL = '/api';
 
 const Container = styled.div`
   width: ${(props) => props.type !== "sm" && "360px"};
@@ -59,7 +60,7 @@ const Card = ({ type, video }) => {
 
   useEffect(() => {
     const fetchChannel = async () => {
-      const res = await axios.get(`/users/find/${video.userId}`);
+      const res = await axios.get(`/users/user/${video.userId}`);
       setChannel(res.data);
     }
     fetchChannel();

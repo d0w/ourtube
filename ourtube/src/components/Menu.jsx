@@ -1,6 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import OurTube from "../img/logo.png";
+import { useSelector } from "react-redux";
 import HomeIcon from "@mui/icons-material/Home";
 import ExploreOutlinedIcon from "@mui/icons-material/ExploreOutlined";
 import SubscriptionsOutlinedIcon from "@mui/icons-material/SubscriptionsOutlined";
@@ -82,6 +83,7 @@ const Title = styled.h2`
 `;
 
 const Menu = ({ darkMode, setDarkMode }) => {
+  const {currentUser} = useSelector(state=>state.user);
   return (
     <Container>
       <Wrapper>
@@ -121,7 +123,8 @@ const Menu = ({ darkMode, setDarkMode }) => {
           History
         </Item>
         <Hr />
-        <Login>
+        { !currentUser &&
+          <><Login>
           Sign in to like videos, comment, and subscribe.
           <Link to="signin" style={{textDecoration:"none"}}>
             <Button>
@@ -131,7 +134,8 @@ const Menu = ({ darkMode, setDarkMode }) => {
           </Link>
         </Login>
         <Hr />
-        <Title>BEST OF LAMATUBE</Title>
+        </>}
+
         <Item>
           <LibraryMusicOutlinedIcon />
           Music

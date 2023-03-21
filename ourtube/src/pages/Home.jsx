@@ -3,6 +3,7 @@ import { useState } from "react";
 import styled from "styled-components";
 import Card from "../components/Card";
 import axios from "axios";
+axios.defaults.baseURL = '/api';
 
 const Container = styled.div`
   display: flex;
