@@ -142,7 +142,7 @@ const Video = () => {
   return (
     <Container>
       <Content>
-        <VideoWrapper>
+        {/* <VideoWrapper>
           <iframe
             width="100%"
             height="720"
@@ -152,7 +152,7 @@ const Video = () => {
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowfullscreen
           ></iframe>
-        </VideoWrapper>
+        </VideoWrapper> */}
         <Title>{currentVideo.title}</Title>
         <Details>
           <Info>{ currentVideo.views } views • {format(currentVideo.createdAt)}</Info>
