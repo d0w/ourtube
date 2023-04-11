@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import VideoCallOutlinedIcon from "@mui/icons-material/VideoCallOutlined"
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/userSlice";
+import Upload from "./Upload";
 
 const Container = styled.div`
   position: sticky;
@@ -36,13 +37,14 @@ const Search = styled.div`
   padding: 5px;
   border: 1px solid #ccc;
   border-radius: 3px;
+  color: ${({ theme }) => theme.text};
 `;
 
 const Input = styled.input`
   border: none;
   background-color: transparent;
   outline: none;
-  color: ${({ theme }) => theme.text};
+  
 `;
 
 const Button = styled.button`
@@ -74,23 +76,30 @@ const Avatar = styled.img `
 `;
 const Navbar = () => {
   const dispatch = useDispatch();
+  const [open, setOpen] = useState(false);
+  const [Q, setQ] = useState("");
   const {currentUser} = useSelector(state=>state.user);
+
+  const navigate = useNavigate();
 
   const userLogout = async (e) => {
     e.preventDefault();
     dispatch(logout());
   }
+
+
   return (
+    <>
     <Container>
       <Wrapper>
         <Search>
-          <Input placeholder="Search" />
-          <SearchOutlinedIcon />
+          <Input onChange={e=>setQ(e.target.value)} placeholder="Search" />
+          <SearchOutlinedIcon onClick={()=>navigate(`/search?q=${Q}`)}/>
         </Search>
         {currentUser ? 
          <>
           <User>
-            <VideoCallOutlinedIcon/>
+            <VideoCallOutlinedIcon onClick={() => setOpen(true)}/>
             <Avatar src={currentUser.img}/>
             {currentUser.name}
           </User>
@@ -104,6 +113,8 @@ const Navbar = () => {
         </Link>}
       </Wrapper>
     </Container>
+    {open && <Upload setOpen={setOpen} />}
+    </>
   );
 };
 

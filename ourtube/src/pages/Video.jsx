@@ -17,6 +17,7 @@ import { format } from "timeago.js";
 import { fetchSuccess, fetchFailure, fetchStart, like, dislike } from "../redux/videoSlice.js";
 import { current } from "@reduxjs/toolkit";
 import { subscription } from "../redux/userSlice";
+import Recommendation from "../components/Recommendation";
 
 
 const Container = styled.div`
@@ -65,9 +66,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
-  flex: 2;
-`;
 const Channel = styled.div`
   display: flex;
   justify-content: space-between;
@@ -137,7 +135,7 @@ const Video = () => {
     const fetchData = async() => {  
       try {
         const videoRes = await axios.get(`/videos/find/${path}`)
-        const channelRes = await axios.get(`/users/user/${videoRes.userId}`);
+        const channelRes = await axios.get(`/users/user/${videoRes.data.userId}`);
         setChannel(channelRes.data);
         //console.log(videoRes)
         dispatch(fetchSuccess(videoRes.data));
@@ -174,7 +172,7 @@ const Video = () => {
     <Container>
       <Content>
         <VideoWrapper>
-          <VideoFrame src={currentVideo.videoUrl} />
+          <VideoFrame src={currentVideo.videoUrl} controls />
         </VideoWrapper>
         <Title>{currentVideo.title}</Title>
         <Details>
@@ -226,6 +224,7 @@ const Video = () => {
         <Hr />
         <Comments videoId={currentVideo._id}/>
       </Content>
+      <Recommendation tags={currentVideo.tags}/>
       
     </Container>
   );
