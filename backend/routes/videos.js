@@ -12,7 +12,7 @@ router.post("/", verifyToken, addVideo);
 router.put("/:id", verifyToken, changeVideo);
 
 // delete video
-router.put("/:id", verifyToken, removeVideo);
+router.delete("/:id", verifyToken, removeVideo);
 
 // get video
 router.get("/find/:id", getVideo);

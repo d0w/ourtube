@@ -33,6 +33,10 @@ const VideoSchema = new mongoose.Schema({
         type: [String],
         default: []
     },
+    description: {
+        type: String,
+        required: true
+    }
     
 }, {timestamps: true})
 

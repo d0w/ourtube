@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useState } from "react";
 import styled from "styled-components";
 import Card from "../components/Card";
+import axios from "axios";
+axios.defaults.baseURL = '/api';
 
 const Container = styled.div`
   display: flex;
@@ -8,29 +11,22 @@ const Container = styled.div`
   flex-wrap: wrap;
 `;
 
-const Home = () => {
+const Home = ({ type }) => {
+  const [videos, setVideos] = useState([]);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      const res = await axios.get(`/videos/${type}`);
+      setVideos(res.data);
+    }
+    fetchVideos();
+  }, [type]);
+
   return (
     <Container>
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
+      { videos.map((video) => (
+        <Card key={video.id} video={video}/>
+      ))}
     </Container>
   );
 };

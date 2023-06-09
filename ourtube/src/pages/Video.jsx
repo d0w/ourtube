@@ -1,11 +1,24 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
 import ThumbUpOutlinedIcon from "@mui/icons-material/ThumbUpOutlined";
 import ThumbDownOffAltOutlinedIcon from "@mui/icons-material/ThumbDownOffAltOutlined";
 import ReplyOutlinedIcon from "@mui/icons-material/ReplyOutlined";
 import AddTaskOutlinedIcon from "@mui/icons-material/AddTaskOutlined";
+import ThumbUpIcon from '@mui/icons-material/ThumbUp';
+import ThumbDownIcon from "@mui/icons-material/ThumbDown";
 import Comments from "../components/Comments";
 import Card from "../components/Card";
+
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { format } from "timeago.js";
+import { fetchSuccess, fetchFailure, fetchStart, like, dislike } from "../redux/videoSlice.js";
+import { current } from "@reduxjs/toolkit";
+import { subscription } from "../redux/userSlice";
+import Recommendation from "../components/Recommendation";
+
 
 const Container = styled.div`
   display: flex;
@@ -53,9 +66,6 @@ const Hr = styled.hr`
   border: 0.5px solid ${({ theme }) => theme.soft};
 `;
 
-const Recommendation = styled.div`
-  flex: 2;
-`;
 const Channel = styled.div`
   display: flex;
   justify-content: space-between;
@@ -104,30 +114,87 @@ const Subscribe = styled.button`
   cursor: pointer;
 `;
 
+const VideoFrame = styled.video`
+  max-height: 720px;
+  width: 100%;
+  object-fit: cover;
+`
+
 const Video = () => {
+  // getting current user from store
+  const { currentUser } = useSelector(state => state.user);
+  const { currentVideo } = useSelector(state => state.video);
+  const dispatch = useDispatch();
+
+  const path = useLocation().pathname.split("/")[2];
+  
+  const [channel, setChannel] = useState({})
+
+  useEffect(() => {
+
+    const fetchData = async() => {  
+      try {
+        const videoRes = await axios.get(`/videos/find/${path}`)
+        const channelRes = await axios.get(`/users/user/${videoRes.data.userId}`);
+        setChannel(channelRes.data);
+        //console.log(videoRes)
+        dispatch(fetchSuccess(videoRes.data));
+      } catch(e) {
+
+      }
+    }
+    fetchData();
+  },[path, dispatch])
+
+  const handleLike = async() => {
+    console.log("Liked video" + currentVideo.title)
+    await axios.put(`/users/like/${currentVideo._id}`);
+    dispatch(like(currentUser._id));
+  }
+
+  const handleDislike = async() => {
+    console.log("Disliked video" + currentVideo.title)
+    await axios.put(`/users/like/${currentVideo._id}`)
+    dispatch(dislike(currentUser._id));
+  }
+
+  const handleSub = async() => {
+    if (currentUser.subscribedUsers.includes(channel._id)) {
+      await axios.put(`/users/unsub/${channel._id}`);
+    } else {
+      await axios.put(`/users/sub/${channel._id}`);
+    }
+    dispatch(subscription(channel._id));
+  }
+
+
   return (
     <Container>
       <Content>
         <VideoWrapper>
-          <iframe
-            width="100%"
-            height="720"
-            src="https://www.youtube.com/embed/k3Vfj-e1Ma4"
-            title="YouTube video player"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-          ></iframe>
+          <VideoFrame src={currentVideo.videoUrl} controls />
         </VideoWrapper>
-        <Title>Test Video</Title>
+        <Title>{currentVideo.title}</Title>
         <Details>
-          <Info>7,948,154 views • Jun 22, 2022</Info>
+          <Info>{ currentVideo.views } views • {format(currentVideo.createdAt)}</Info>
           <Buttons>
-            <Button>
-              <ThumbUpOutlinedIcon /> 123
+            <Button onClick={handleLike}>
+              { currentVideo.likes?.includes(currentUser._id)
+               ? 
+               (<ThumbUpIcon />)
+              :
+              <ThumbUpOutlinedIcon /> 
+              }{" "}
+              { currentVideo.likes?.length }
             </Button>
-            <Button>
-              <ThumbDownOffAltOutlinedIcon /> Dislike
+            <Button onClick={handleDislike}>
+              {/* if current user disliked, fill it in */}
+              { currentVideo.dislikes?.includes(currentUser._id) ? 
+              <ThumbDownIcon />
+              :
+              <ThumbDownOffAltOutlinedIcon /> 
+              } 
+              { currentVideo.dislikes?.length}
             </Button>
             <Button>
               <ReplyOutlinedIcon /> Share
@@ -140,38 +207,25 @@ const Video = () => {
         <Hr />
         <Channel>
           <ChannelInfo>
-            <Image src="https://yt3.ggpht.com/yti/APfAmoE-Q0ZLJ4vk3vqmV4Kwp0sbrjxLyB8Q4ZgNsiRH=s88-c-k-c0x00ffffff-no-rj-mo" />
+            <Image src= {channel.img} />
             <ChannelDetail>
-              <ChannelName>Lama Dev</ChannelName>
-              <ChannelCounter>200K subscribers</ChannelCounter>
+              <ChannelName>{channel.name}</ChannelName>
+              <ChannelCounter>{channel.subscribers}</ChannelCounter>
               <Description>
-                Lorem ipsum dolor, sit amet consectetur adipisicing elit.
-                Doloribus laborum delectus unde quaerat dolore culpa sit aliquam
-                at. Vitae facere ipsum totam ratione exercitationem. Suscipit
-                animi accusantium dolores ipsam ut.
+                { currentVideo.description }
               </Description>
             </ChannelDetail>
           </ChannelInfo>
-          <Subscribe>SUBSCRIBE</Subscribe>
+          <Subscribe onClick={handleSub}>
+            {currentUser.subscribedUsers?.includes(channel._id) ?"SUBSCRIBED" :"SUBSCRIBE"}
+          
+          </Subscribe>
         </Channel>
         <Hr />
-        <Comments/>
+        <Comments videoId={currentVideo._id}/>
       </Content>
-      <Recommendation>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-        <Card type="sm"/>
-      </Recommendation>
+      <Recommendation tags={currentVideo.tags}/>
+      
     </Container>
   );
 };
