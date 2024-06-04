@@ -3,7 +3,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth"
 
-const googleAPI = "AIzaSyB0bGzzVEjwZ7UqAr9OcrMTWZmkAqj9l9U";
+const googleAPI = process.env.FIREBASE_API;
 
 // TODO: Add SDKs for Firebase products that you want to use
 
